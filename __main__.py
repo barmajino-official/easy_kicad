@@ -8,6 +8,7 @@ from textwrap import dedent
 from typing import List
 
 from easyeda2kicad import __version__
+from easyeda2kicad.database.db_manager import DBManager
 from easyeda2kicad.easyeda.easyeda_api import EasyedaApi
 from easyeda2kicad.easyeda.easyeda_importer import (
     Easyeda3dModelImporter,
@@ -254,11 +255,43 @@ def main(argv: List[str] = sys.argv[1:]) -> int:
         logging.error(f"Failed to fetch data from EasyEDA API for part {component_id}")
         return 1
 
-    # ---------------- SYMBOL ----------------
+    # --- CATEGORIZATION LOGIC ---
+    db = DBManager()
+    metadata = db.get_part_metadata(component_id)
+    
+    if metadata:
+        category = metadata['category_name'].replace("/", "_").replace(" ", "_")
+        subcategory = metadata['subcategory_name'].replace("/", "_").replace(" ", "_")
+        lib_name = f"{category}_{subcategory}"
+        output_root = "outputFiles"
+        
+        # Override output paths
+        arguments['output'] = f"{output_root}/{lib_name}"
+        
+        # Ensure directories exist
+        os.makedirs(output_root, exist_ok=True)
+        os.makedirs(f"{arguments['output']}.pretty", exist_ok=True)
+        os.makedirs(f"{arguments['output']}.3dshapes", exist_ok=True)
+        
+        # Inject metadata into cad_data if available
+        # Note: We'll pass this metadata to the importers
+    else:
+        logging.warning(f"No metadata found in database for {component_id}. Using default library name.")
+        if not arguments.get("output"):
+            arguments["output"] = "easyeda2kicad"
+
+    # Initialize library files if they don't exist
+    if not valid_arguments(arguments=arguments):
+        return 1
     if arguments["symbol"]:
         importer = EasyedaSymbolImporter(easyeda_cp_cad_data=cad_data)
         easyeda_symbol: EeSymbol = importer.get_symbol()
-        # print(easyeda_symbol)
+        
+        # Enrich with DB metadata
+        if metadata:
+            easyeda_symbol.info.category = metadata['category_name']
+            easyeda_symbol.info.subcategory = metadata['subcategory_name']
+            easyeda_symbol.info.description = metadata['description']
 
         is_id_already_in_symbol_lib = id_already_in_symbol_lib(
             lib_path=f"{arguments['output']}.{sym_lib_ext}",

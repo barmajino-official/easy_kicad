@@ -310,6 +310,9 @@ def convert_to_kicad(ee_symbol: EeSymbol, kicad_version: KicadVersion) -> KiSymb
         datasheet=ee_symbol.info.datasheet,
         lcsc_id=ee_symbol.info.lcsc_id,
         jlc_id=ee_symbol.info.jlc_id,
+        category=ee_symbol.info.category,
+        subcategory=ee_symbol.info.subcategory,
+        description=ee_symbol.info.description,
     )
 
     kicad_symbol = KiSymbol(

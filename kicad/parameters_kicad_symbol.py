@@ -140,6 +140,9 @@ class KiSymbolInfo:
     datasheet: str
     lcsc_id: str
     jlc_id: str
+    category: str = ""
+    subcategory: str = ""
+    description: str = ""
     y_low: Union[int, float] = 0
     y_high: Union[int, float] = 0
 
@@ -305,6 +308,60 @@ class KiSymbolInfo:
                     key="JLC Part",
                     value=self.jlc_id,
                     id_=6,
+                    pos_y=self.y_low - field_offset_y,
+                    font_size=KiExportConfigV6.PROPERTY_FONT_SIZE.value,
+                    style="",
+                    hide="hide",
+                )
+            )
+
+        if self.category:
+            field_offset_y += KiExportConfigV6.FIELD_OFFSET_INCREMENT.value
+            header.append(
+                property_template.format(
+                    key="Category",
+                    value=self.category,
+                    id_=7,
+                    pos_y=self.y_low - field_offset_y,
+                    font_size=KiExportConfigV6.PROPERTY_FONT_SIZE.value,
+                    style="",
+                    hide="hide",
+                )
+            )
+
+        if self.subcategory:
+            field_offset_y += KiExportConfigV6.FIELD_OFFSET_INCREMENT.value
+            header.append(
+                property_template.format(
+                    key="Subcategory",
+                    value=self.subcategory,
+                    id_=8,
+                    pos_y=self.y_low - field_offset_y,
+                    font_size=KiExportConfigV6.PROPERTY_FONT_SIZE.value,
+                    style="",
+                    hide="hide",
+                )
+            )
+
+        if self.description:
+            # We add both a custom property and the reserved ki_description
+            field_offset_y += KiExportConfigV6.FIELD_OFFSET_INCREMENT.value
+            header.append(
+                property_template.format(
+                    key="Description",
+                    value=self.description,
+                    id_=9,
+                    pos_y=self.y_low - field_offset_y,
+                    font_size=KiExportConfigV6.PROPERTY_FONT_SIZE.value,
+                    style="",
+                    hide="hide",
+                )
+            )
+            header.append(
+                property_template.format(
+                    key="ki_description",
+                    value=self.description,
+                    id_=10,
                     pos_y=self.y_low - field_offset_y,
                     font_size=KiExportConfigV6.PROPERTY_FONT_SIZE.value,
                     style="",
