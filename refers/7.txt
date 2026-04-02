@@ -1,0 +1,1097 @@
+
+File Formats > Legacy Board Format (pre 4.0)
+Legacy Board Format (pre 4.0)
+This is for the PCB file format before the S expression format introduced in KiCad 4.0. This documentation is a mostly verbatim copy of what was written back then and the quality may be poor. This is only included as a reference and is not maintained.
+Information about V1 version:
+Board files ( *.brd files ) are in ASCII format.
+
+Dimensions are in 1/10000 inch, except for the page size (in 1/1000 inch).
+
+First line is something as: PCBNEW-BOARD Version 1 date 02/04/2011 15:04:20 All the following descriptions are like this:
+
+$DESCRIPTION
+some data
+…
+$endDESCRIPTION
+When <DESCRIPTION> is an identifier which gives the meaning of the data between $DESCRIPTION and $endDESCRIPTION.
+
+Example:
+
+$GENERAL
+encoding utf-8
+LayerCount 2
+Ly 1FFF8001
+Links 66
+NoConn 0
+Di 24940 20675 73708 40323
+Ndraw 16
+Ntrack 267
+Nzone 1929
+Nmodule 29
+Nnets 26
+$EndGENERAL
+
+$SHEETDESCR
+Sheet A4 11700 8267
+Title ""
+Date "23 feb 2004"
+Rev ""
+Comp ""
+Comment1 ""
+Comment2 ""
+Comment3 ""
+Comment4 ""
+$EndSHEETDESCR
+Information about V2 version:
+The file format is exactly the same format, and the extension is still .brd. However, dimensions are in mm (floating notation), except for the page size (in 1/1000 inch). Because the internal Pcbnew unit is now 1nm, the integer coordinates in 1/10000 inch cannot be used in files. Of course, the Pcbnew versions which are in nm are able to read the V1 version files, but can only write files in V2 version. The V2 version should be seen as a temporary way to store boards without loss of resolution.
+
+First line is something as:
+
+PCBNEW-BOARD Version 2 date 22/02/2013 15:04:20
+
+All the following descriptions are like this:
+
+$DESCRIPTION
+some data
+…
+$endDESCRIPTION
+Example:
+
+PCBNEW-BOARD Version 2 date 22/02/2013 10:33:30
+
+# Created by Pcbnew(2013-02-20 BZR 3963)-testing
+
+$GENERAL
+encoding utf-8
+Units mm
+LayerCount 2
+EnabledLayers 1FFF8001
+Links 200
+NoConn 0
+Di 69.241669 24.89454 202.336401 196.2404
+Ndraw 19
+Ntrack 779
+Nzone 0
+BoardThickness 1.6002
+Nmodule 25
+Nnets 111
+$EndGENERAL
+Information about new “S expression” version:
+For Pcbnew versions in nanometers, the default file format is now using “S expressions”. This new format uses mm for coordinates, fixes issues (like spaces in names) in V1 and V2 versions, and is more human readable than the older format. The new file extension is .kicad_pcb
+
+Here is a sample:
+
+(kicad_pcb (version 3) (host pcbnew "(2013-01-12 BZR 3902)-testing")
+
+  (general
+    (links 200)
+    (no_connects 0)
+    (area 69.241669 24.89454 202.336401 196.2404)
+    (thickness 1.6002)
+    (drawings 19)
+    (tracks 779)
+    (zones 0)
+    (modules 25)
+    (nets 111)
+  )
+
+  (page A4)
+  (title_block
+    (title Demo)
+    (rev 2.C)
+    (company Kicad)
+  )
+Layer numbering:
+Tracks and other items (texts, drawings …​) use one layer. Pads and vias use several layers. There are 16 copper layers and 13 technical layers. The layer parameter used in descriptions has the value:
+
+value
+
+layer name
+
+0
+
+Copper layer
+
+"Copper" layers
+
+1 to 14
+
+Inner layers
+
+15
+
+Component layer
+
+16
+
+Copper side adhesive layer
+
+"Technical" layers
+
+17
+
+Component side adhesive layer
+
+18
+
+Copper side Solder paste layer
+
+19
+
+Component Solder paste layer
+
+20
+
+Copper side Silk screen layer
+
+21
+
+Component Silk screen layer
+
+22
+
+Copper side Solder mask layer
+
+23
+
+Component Solder mask layer
+
+24
+
+Draw layer (Used for general drawings)
+
+25
+
+Comment layer (Other layer used for general drawings)
+
+26
+
+ECO1 layer (Other layer used for general drawings)
+
+27
+
+ECO2 layer (Other layer used for general drawings)
+
+28
+
+Edge layer. Items on Edge layer are seen on all layers
+
+29
+
+Not yet used
+
+30
+
+Not yet used
+
+31
+
+Not yet used
+
+Mask layer: Sometimes, a mask layer parameter is used. It is a 32 bits mask used to indicate a layer group usage (0 up to 32 layers). A mask layer parameter is given in hexadecimal form. Bit 0 is the copper layer, bit 1 is the inner 1 layer, and so on…​(Bit 27 is the Edge layer). Mask layer is the ORed mask of the used layers
+
+First line of description:
+Format:
+
+PCBNEW-BOARD Version <version number> date <date>-<time>
+
+Date and time are useful only for information (not used by pcbnew).
+
+$GENERAL
+This data is useful only when loading file. It is used by Pcbnew for displaying activity when loading data.
+
+$GENERAL
+
+Start description
+
+Ly 1FFF8001
+
+Obsolete (used for old pcbnew compatibility)
+
+Links 66
+
+Total number of connections
+
+NoConn 0
+
+Remaining connections
+
+Di 24940 20675 73708 40323
+
+Bounding box coordinates:
+X_start Y_start X_end Y_end
+
+Ndraw 16
+
+Number of draw items like edge segments, texts…​
+
+Ntrack 267
+
+Number of track segments
+
+Nzone 1929
+
+Number of zone segments
+
+Nmodule 29
+
+Number of modules
+
+Nnets 26
+
+Number of nets
+
+$EndGENERAL
+
+End description
+
+$SHEETDESCR
+This the page size and texts.
+
+$SHEETDESCR
+
+Start description
+
+Sheet A4 11700 8267
+
+<Page size> X_size Y_size in mils (1/1000 inch)
+
+Title ""
+
+Title text
+
+Date "23 feb 2004"
+
+Date text
+
+Rev ""
+
+Revision text
+
+Comp ""
+
+Company name text
+
+Comment1 ""
+
+Comment text, line 1
+
+Comment2 ""
+
+Comment text, line 2
+
+Comment3 ""
+
+Comment text, line 3
+
+Comment4 ""
+
+Comment text, line 4
+
+$EndSHEETDESCR
+
+End description
+
+$SETUP block:
+This data bock is used for design settings This is useful only for board edition. Example:
+
+$SETUP
+InternalUnit 0.000100 INCH
+Layers 2
+Layer[0] Cuivre signal
+Layer[15] Composant signal
+TrackWidth 250
+TrackWidthHistory 25
+TrackWidthHistory 170
+TrackWidthHistory 250
+TrackClearence 110
+ZoneClearence 150
+DrawSegmWidth 150
+EdgeSegmWidth 50
+ViaSize 600
+ViaDrill 250
+ViaSizeHistory 600
+MicroViaSize 200
+MicroViaDrill 80
+MicroViasAllowed 0
+TextPcbWidth 170
+TextPcbSize 600 800
+EdgeModWidth 150
+TextModSize 600 600
+TextModWidth 120
+PadSize 1500 2500
+PadDrill 1200
+AuxiliaryAxisOrg 29500 55500
+$EndSETUP
+$SETUP
+
+Start block "SETUP"
+
+InternalUnit 0.000100 INCH
+
+Internal unit for Pcbnew, all coordinates are in this unit
+
+Layers 2
+
+Number of layers (2 = double sided board) must be 1 to 16
+
+Layer[0] Cuivre signal
+
+layer name and type
+name = name given to the layer by the user (here: "cuivre"
+type = signal (not current used in Pcbnew)
+
+Layer[15] Composant signal
+
+TrackWidth 250
+
+Current track width
+
+TrackWidthHistory 170
+
+Last used track widths
+
+TrackWidthHistory 250
+
+TrackWidthHistory 400
+
+TrackClearence 100
+
+Isolation for DRC (Design rules check)
+
+ZoneClearence 200
+
+Isolation used in zone filling
+
+DrawSegmWidth 120
+
+Current segment width for drawings on technical layers
+
+EdgeSegmWidth 120
+
+Current segment width for drawings on "edge layer"
+
+ViaSize 700
+
+Current via size
+
+ViaDrill 250
+
+Via drill for this board
+
+ViaSizeHistory 450
+
+Last used via sizes
+
+ViaSizeHistory 650
+
+ViaSizeHistory 700
+
+TextPcbWidth 120
+
+Current text width for texts on copper or technical layers. This is not for text on footprints
+
+TextPcbSize 600 600
+
+Current text X Y size
+
+EdgeModWidth 120
+
+Current Segment width for footprint edition
+
+TextModSize 120 600
+
+Current text XY size for texts for footprint edition
+
+TextModWidth 120
+
+Current text width for texts for footprint edition
+
+PadSize 700 700
+
+Current X Y pad size (footprint edition)
+
+PadDrill 320
+
+Current pad drill
+
+AuxiliaryAxisOrg 0 0
+
+Auxiliary axis position
+(Auxiliary axis is the reference coordinate (0 0 coordinate) for EXCELLON drilling files
+
+$EndSETUP
+
+End block "SETUP"
+
+$EQUIPOT
+$EQUIPOT describes a net name.
+
+$EQUIPOT
+
+Start block
+
+Na 2 "N-000026"
+
+Na <internal net number> « net name »
+
+St ~
+
+$EndEQUIPOT
+
+End block
+
+Note1: Internal net number is an arbitrary number. It is computed by Pcbnew when compiling netlist. Note2: Net 0 is not a real net. Net 0 is the net number used internally by Pcbnew for all the no connected pads.
+
+Example:
+
+$EQUIPOT;
+Na 0 ""
+St ~
+$EndEQUIPOT
+$EQUIPOT
+Na 1 "DONE"
+St ~
+$EndEQUIPOT
+$EQUIPOT
+Na 2 "N-000026"
+St ~
+$EndEQUIPOT
+$EQUIPOT
+Na 3 "TD0/PROG"
+St ~
+$EndEQUIPOT
+$MODULE
+Description start by: $MODULE <module name>`
+
+And ends with $EndMODULE <module name>`
+
+Module description has four sections:
+
+General description (fixed size)
+
+Field description (variable size)
+
+Drawing description (variable size)
+
+Pad description. (variable size)
+
+3D shape information.
+
+Note: All coordinates are relative to the module position. Its means the coordinates of segments, pads, texts …​ are given for a module in position 0, rotation 0. If a module is rotated or mirrored, real coordinates must be computed according to the real position and rotation.
+
+General description:
+$MODULE bornier6
+
+$MODULE <module lib name>
+
+Po 62000 30500 2700 15 3EC0C28A 3EBF830C ~~
+
+Po Xpos Ypos Orientation(0.1deg) Layer TimeStamp Attribut1Attribut2
+Attribut1 = ~or 'F' for autoplace (F = Fixed, ~= moveable)
+Attribut2 = ~or 'P' for autoplace (P = autoplaced)
+
+Li bornier6
+
+Li <module lib name>
+
+Cd Bornier d’alimentation 4 pins
+
+Cd comment description (displayed when browsing libraries)
+
+Kw DEV
+
+Kw Keyword1 Keyword2 …​ (for footprint selection by keywords)
+
+Sc 3EBF830C
+
+Sc TimeStampOp
+
+Op 0 0 0
+
+Op <rotation cost 90 deg> <rotation cost 180 deg> for auto place.
+rotation cost = 0 (no rotation allowed) to 10 (null cost)
+
+Note: Usually, components are on layer 15 (component layer) or 0 (copper layer). If the component is on layer 0, it is"mirrored". The "mirror axis is the X axis
+
+Field Description:
+There are 2 to 12 fields
+
+Field 0 = component reference (U1, R5 …​) (required) Field 1 = component value (10K, 74LS02 …​) (required) Other fields (optional) are comments. Format:
+
+T<field number> <Xpos> <Ypos> <Xsize> <Ysize> <rotation> <penWidth> N <visible> <layer> "text"`
+
+Field
+
+Units
+
+Meaning
+
+field number
+
+enumeration
+
+0⇒reference, 1⇒value, etc.
+
+Xpos
+
+tenths of mils (.0001 inches)
+
+The horizontal offset relative to the module’s overall position
+
+Ypos
+
+tenths of mils (.0001 inches)
+
+The vertical offset relative to the module’s overall position
+
+Xsize
+
+tenths of mils (.0001 inches)
+
+The horizontal size of the character 'M'
+
+Ysize
+
+tenths of mils (.0001 inches)
+
+The vertical size of the character 'M'
+
+rotation
+
+tenths of degrees
+
+Angular rotation from horizontal, counterclockwise
+
+penWidth
+
+tenths of mils (.0001 inches)
+
+Width of the pen used to draw characters
+
+N
+
+none
+
+flag for the parser?
+
+visible
+
+boolean
+
+I⇒ invisible, V⇒ visible
+
+layer
+
+enumeration
+
+see layer numbers above
+
+Examples:
+
+T0 500 -3000 1030 629 2700 120 N V 21 "P1"
+
+T0 ⇒ reference
+
+T1 0 3000 1201 825 2700 120 N V 21 "CONN_6"
+
+T1 ⇒ value
+
+Drawings:
+Tells how to draw module shape. They cannot be on a copper layer (DRC ignore them) Drawings are segment, circle, arc, polygon.
+
+Draw segment:
+DS -6000 -1500 -6000 1500 120 21
+
+DS is a Draw Segment
+DS Xstart Ystart Xend Yend Width Layer
+
+DS 6000 1500 6000 -1500 120 21
+
+An other Draw Segment
+
+Circle:
+DC Xcentre Ycentre Xpoint Ypoint Width Layer
+
+DC is a Draw Circle
+Xpoint, Ypoint is a point on the circle.
+
+Arc:
+DA Xcentre Ycentre Xstart_point Ystart_point angle width layer
+
+DA is a Draw Arc
+angle is the arc angle in 0.1 degrees
+
+Polygon:
+DP 0 0 0 0 corners_count width layer
+
+Draw Polygon
+First line of a polygon.
+The polygon should be closed, otherwise this is a poly-line.
+width is the thickness of outlines.
+
+Dl corner_posx corner_posy
+
+Corner coordinate
+( corners_count lines like this)
+
+Pad Descriptions:
+All the pads of this footprint are listed here (Many $PAD/$EndPAD sections here).. See $PAD description.
+
+$SHAPE3D
+3D shape information: The real shape description is a vrml file, build by Wings3d. This shape can be scaled, moved and rotated. This is because a single 3D shape can be used for many footprints (for instance, we use the shape resistor.wrl for several resistor footprints, by tuning the X, Y, Z scale of the 3D shape according to the different size of resistor footprints). Some smd footprints are using this feature. For the same reasons, the 3D shape can be moved (by the move factor) and/or rotated. Real shape unit is 0.1 inch (1 unit vrml = 0.1 inch = 2.54 millimeter). An other reason exists: when a footprint is very big ( a big connector) or very small (a small SMD resistor) we must create a 3D shape small or bigger than real size, in order to use easily the 3D modeler.
+
+$SHAPE3D
+
+Start description
+
+Na "device/bornier_6.wrl"
+
+FileName (default path is kicad/modules/packages3d/)
+
+Sc 1.000000 1.000000 1.000000
+
+X Y Z scale factor
+
+Of 0.000000 0.000000 0.000000
+
+X Y Z offset (move vector, in 3D units (0.1 inch))
+
+Ro 0.000000 0.000000 0.000000
+
+X Y Z rotation (in degree)
+
+$EndSHAPE3D
+
+End description
+
+The 3D shape coordinates are relative to the footprint coordinates. The 3D shape must be scale, moved and rotated according to the parameters Sc Of and Ro, and after moved and rotated according to the footprint coordinates and rotation. If the footprint is « inverted » (that is, located on copper side) the 3D shape must be « inverted » too.
+
+A footprint may have several 3D shapes (for instance an integrated circuit and his socket).
+$PAD
+Pads have different shapes and attributes. Pad shapes are: * Circle. * Oblong(or oval). * Rectangular (Square is like a rectangle). * Trapeze.
+
+Pad attributes are:
+
+Normal (Has usually a hole)
+
+Smd (used for Surface Mounted Devices). Has no hole.
+
+Connector (used for connectors like a PC Board Bus connector)
+
+Mechanical. (Like a hole for mechanical use)
+
+And shape can be draw with an offset related to the drilling hole. The hole shale is round or oblong
+
+$PAD
+
+Start description
+
+Sh "2" C 1500 1500 0 0 2700
+
+Shape: <pad name> shape Xsize Ysize Xdelta Ydelta Orientation
+
+Dr 600 0 0
+or (oblong hole)
+Dr 600 0 0 O 600 650
+
+Drill <Pad drill> Xoffset Yoffset (round hole)
+or (oblong hole)
+Drill <Pad drill.x> Xoffset Yoffset <Hole shape> <Pad drill.x> <Pad drill.y>
+
+At STD N 00E0FFFF
+
+Attributs: <Pad type> N <layer mask>
+
+Ne 8 "GND"
+
+Net reference of the pad: <netnumber> <net name>
+
+Po -3000 0
+
+X_pos Y_pos (relative to the module position)
+
+$EndPAD
+
+End description
+
+Note: <Pad type> is the Pad Attribute. It is one of: "STD" "SMD" "CONN" "HOLE" "MECA". Shape is one of:
+
+C (circle)
+
+R (Rectangular).
+
+O (Oblong)
+
+T (Trapèze) Hole shape = O (O for Oblong)
+
+Example:
+
+$PAD
+Sh "3" C 1500 1500 0 0 2700
+Dr 600 0 0
+At STD N 00E0FFFF
+Ne 10 "TD0_1"
+Po -1000 0
+$EndPAD
+Graphic items:
+There are drawing items like segments, circles, texts, targets and cotations.
+
+$DRAWSEGMENT
+Draw segments are:
+
+segments (strait line)
+
+circles
+
+arcs
+
+Line:
+$DRAWSEGMENT
+
+Start description
+
+Po 0 67500 39000 65500 39000 120
+
+Position shape Xstart Ystart Xend Yend width
+
+De 28 0 900 0 0
+
+Description layer type angle timestamp status
+
+$EndDRAWSEGMENT
+
+End description
+
+Note:
+
+shape = 0
+
+Angle is used only for arc segments (unused for line, left for compatibility).
+
+Circle:
+$DRAWSEGMENT
+
+Start description
+
+Po 1 67500 39000 65500 39000 120
+
+Position shape Xcentre Ycentre Xend Yend width
+
+De 28 0 900 0 0
+
+Description layer type angle timestamp status
+
+$EndDRAWSEGMENT
+
+End description
+
+Note: * shape = 1 * Angle is used only for arc segments (unused for circle, left for compatibility). * End is a point of this circle. (If Xend or Yend is 0, the other coordinate is the radius)
+
+Arc:
+$DRAWSEGMENT
+
+Start description
+
+Po 2 67500 39000 65500 39000 120
+
+Position shape Xstart Ystart Xend Yend width
+
+De 28 0 900 0 0
+
+Description layer type angle timestamp status
+
+$EndDRAWSEGMENT
+
+End description
+
+Note:
+
+shape = 2
+
+start and end are the 2 points of the arc. angle is the arc angle (in 0.1 degree). Center coordinates are computed by pcbnew from start, end and angle.
+
+Currently, only 90 degrees arcs are supported.(thereby, angle = 900)
+
+Example:
+
+$DRAWSEGMENT
+Po 0 67500 34000 67500 39000 120
+De 28 0 900 0
+$EndDRAWSEGMENT
+$TEXTPCB
+$TEXTPCB
+
+Start description
+
+Te "TDI"
+
+Text "string"
+
+Po 57250 35750 600 600 150 0
+
+Position Xstart Ystart Xsize Ysize Width rotation
+
+De 15 1 B98C Normal
+
+Description layer normal timestamp style
+normal = 0 : text is mirrored.
+normal = 1 : text is normal.
+style = Normal or Italic
+
+$EndTEXTPCB
+
+End description
+
+Example:
+
+$TEXTPCB
+Te "TCK"
+Po 57250 33500 600 600 150 0
+De 15 1 B98C Normal
+$EndTEXTPCB
+$MIRE
+ shape 1
+shape 0
+$MIREPCB
+
+Start description
+
+Po 0 28 28000 51000 5000 150 00000000
+
+Position shape Xpos Ypos size width timestamp
+
+$EndMIREPCB
+
+End description
+
+$COTATION
+$COTATION
+
+Start description
+
+Ge 0 24 0
+
+General shape layer timestamp
+currently, shape = 0.
+
+Te "4,5500''"
+
+Text "string"
+string is the cotation value in inches or millimeters
+
+Po 50250 5791 600 800 170 0 1
+
+Position (for text) Xpos Ypos Xsize Ysize width orient normal
+
+Sb 0 27500 6501 73000 6501 150
+
+Coordinates of segments (axis, arrows…​)
+
+Sd 0 73000 9000 73000 5081 150
+
+Sg 0 27500 9000 27500 5081 150
+
+S1 0 73000 6501 72557 6731 150
+
+S2 0 73000 6501 72557 6271 150
+
+S3 0 27500 6501 27943 6731 150
+
+S4 0 27500 6501 27943 6271 150
+
+$EndCOTATION
+
+End description
+
+Track, vias and Zone section:
+$TRACK
+Track section decribes tracks and vias on copper layers. Each track (or via) has a two line description: For a track segment:
+
+Position shape Xstart Ystart Xend Yend width
+Description layer 0 netcode timestamp status Shape parameter is set to 0 (reserved for future changes).
+
+For a via: Position shape Xstart Ystart Xend Yend diameter
+Description layer 1 netcode timestamp status
+
+For a via, layer parameter gives : On the 4 less significant bits: the starting layer of the via
+On the 4 next bits: the ending layer.
+
+For instance, a via starting at copper kayer (layer 0) end ending at component layer (layer 15 has the layer parameter set to F0 hexadecimal or 240 decimal. + Shape parameter is the via type (through = 3, blind = 2, buried = 1) + Timestamp parameters are set to 0 (reserved for future changes).
+Status parameter can be set to 0 (Used internally for routing information).
+
+$TRACK
+
+Start description
+
+Po 0 36750 37000 36550 37000 250
+
+Position shape Xstart Ystart Xend Yend width width = diameter for a via
+
+De 15 0 1 0 400
+
+Description layer type netcode timestamp status
+type = 0 for a track segment.
+type = 1 for a via
+
+Po 0 39000 36750 38750 37000 250
+
+An other track
+
+De 15 0 1 0 0
+
+Po 3 53500 27000 53500 27000 650
+
+This is a via (via "through") from layer 15 (component) to layer 0 (copper)
+
+De 15 1 14 0 0
+
+$EndTRACK
+
+End description
+
+$ZONE
+Zone section is like track section. (There is no via in Zone section). It is used to handle a zone filling, from a zone outline.
+
+$ZONE
+
+Start description
+
+Po 0 67100 33700 67100 38600 100
+
+Same as track description
+
+De 0 0 2 3EDDB09D 0
+
+$EndZONE
+
+End description
+
+$CZONE_OUTLINE
+Describes the main outlines of a zone and the outlines of filled areas (solid polygons) inside the zone main outlines. Outlines of filled areas can be missing (if the zone is not currently filled). Because a zone handles thermal reliefs, there are options to describe pads in zones options and thermal reliefs parameters.
+
+Example:
+
+$CZONE_OUTLINE
+ZInfo 47868246 1 "GND"
+ZLayer 0
+ZAux 4 E
+ZClearance 150 T
+ZMinThickness 190
+ZOptions 0 32 F 200 200
+ZCorner 74750 51750 0
+ZCorner 74750 13250 0
+ZCorner 29750 13250 0
+ZCorner 29750 51750 1
+....
+$POLYSCORNERS
+74655 51655 0 0
+74655 13345 0 0
+...
+$endPOLYSCORNERS
+$endCZONE_OUTLINE
+$CZONE_OUTLINE
+
+Start description
+
+ZInfo 478E3FC8 1 "/aux_sheet/INPUT" <Time stamp> <internal netcode> "net name"
+
+ZLayer 0 Layer (0 = copper, 15 = component, 1 ..14 = inner layers)
+
+ZAux 4 E <corners count> <zone hatching option>
+
+zone hatching option = N (none), E (edge hatching) or F (full hatching)
+
+ZClearance 200 T <Zone clearance> <pads option = I, T or X>
+
+I = pads in zone
+
+T = Thermal reliefs
+
+X = pads not in zone.
+
+ZMinThickness 190 <Zone min thickness (for copper zone)>
+
+ZOptions 0 32 F 200 200 <fill mode> <arc approx> <antipad thickness> <thermal stubs width>
+
+fill mode = 0 (use solid polygons) or 1 (use segments)
+
+arc approx = 16 or 32 (segments count to approximate a 360 arc)
+
+ZCorner 49450 19150 0 First corner (external outline)
+
+ZCorner 40600 19150 0 Next corner
+
+ZCorner 40600 22850 0
+
+ZCorner 49450 22850 1 End corner (flag = 1)
+
+$POLYSCORNERS Start of filled areas outlines
+
+74655 51655 0 0 First corner (first filled area outline)
+
+74655 13345 0 0 Next corner
+
+$endPOLYSCORNERS
+
+$endCZONE_OUTLINE
+
+End description
+
+Other example:
+
+$CZONE_OUTLINE	Start description of an other outline
+ZInfo 47B3E800 3 "VCC"
+ZLayer 1
+ZAux 8 F
+ZClearance 200 T
+ZMinThickness 190	Zone min thickness (for copper zone)
+ZOptions 0 32 F 200 200
+ZCorner 49704 23032 0	First corner (external outline)
+ZCorner 49704 18940 0
+ZCorner 46140 19024 0
+ZCorner 46148 20000 0
+ZCorner 45250 20000 0
+ZCorner 44750 21250 0
+ZCorner 43750 22250 0
+ZCorner 46176 23068 1	End corner (flag = 1)
+ZCorner 48450 19900 0	First corner (this is a hole)
+ZCorner 48450 20800 0
+ZCorner 47350 20800 0
+ZCorner 47250 19900 1	End corner (flag = 1)
+$endCZONE_OUTLINE	End description
+$EndBOARD
+$EndBOARD terminates the whole board description. Must be the last line.
+
+ Last Modified 2024-05-10
+Developer Documentation | KiCad
+Search
+Search...
+ Getting Started
+ Build
+ Rules and Guidelines
+ Components
+ APIs and Bindings
+ Source Code Docs
+ Translation
+ KiCad Addons
+ File Formats
+S-Expression Format
+Footprint Library File Format
+Board File Format
+Symbol Library File Format
+Schematic File Format
+Work Sheet File Format
+ Legacy Formats (4.0 up to 6.0)
+Legacy Board Format (pre 4.0)
+ Import Formats
+More
+ GitLab repo
+ 
+Language
+English
+ 
+Theme
+Auto
+Built with  by Hugo
+
