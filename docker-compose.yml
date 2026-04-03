@@ -1,14 +1,13 @@
 services:
   mirror-tool:
-    build: .
-    image: easy-kicad:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
     container_name: easy-kicad-distributor
     volumes:
       - ./database:/app/database
       - ./outputFile:/app/outputFile
-    # Override the entrypoint to run our bulk search script
-    entrypoint: /app/easy_kicad/bulk_run.sh
+    # Always pull environment variables
     environment:
-      # Categories to mirror separated by spaces
       - CATEGORIES=esp resistor transistor microcontroller can_bus regulator led optocoupler
     restart: "no" # Stop once all categories are done
