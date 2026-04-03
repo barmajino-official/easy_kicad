@@ -1,0 +1,14 @@
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "easy_kicad"
+version = "0.8.0"
+dependencies = [
+    "requests",
+    "pydantic"
+]
+
+[project.scripts]
+easy_kicad = "easy_kicad.__main__:main"

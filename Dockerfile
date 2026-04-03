@@ -1,4 +1,3 @@
-# Use a lightweight Python base image
 FROM python:3.12-slim
 
 # Install system dependencies
@@ -7,25 +6,21 @@ RUN apt-get update && apt-get install -y \
     curl \
     && rm -rf /var/lib/apt/lists/*
 
-# Move code to an isolated package path for robust importing
-WORKDIR /opt/easy_kicad_app
-COPY . easy_kicad/
+# Set up the application build context
+# (Copying everything to /tmp/build/ and then installing it)
+WORKDIR /tmp/build/
+COPY . .
 
-# Ensure scripts are executable
-RUN chmod +x easy_kicad/bulk_run.sh
+# 🛡️ THE HOLY GRAIL: Install the project as a formal package
+RUN pip install --no-cache-dir .
 
-# Most critical line: set PYTHONPATH to parent of 'easy_kicad' folder
-ENV PYTHONPATH=/opt/easy_kicad_app
-
-# Install requirements
-# Use --no-cache-dir to minimize image size
-RUN pip install --no-cache-dir requests pydantic
-
-# Create absolute mount points for volumes
+# Now we move to our runtime folder
 RUN mkdir -p /app/database /app/outputFile
+WORKDIR /app
 
-# Set WorkDir for the script execution to be the ROOT (for relative paths)
-WORKDIR /opt/easy_kicad_app
+# The package-installed 'bulk_run.sh' is also copied for utility
+# OR we can just use the one from the build folder if needed
+RUN cp /tmp/build/bulk_run.sh /app/bulk_run.sh && chmod +x /app/bulk_run.sh
 
-# Entry point: Run the script from the root /opt/easy_kicad_app
-ENTRYPOINT ["/opt/easy_kicad_app/easy_kicad/bulk_run.sh"]
+# Default entrypoint for the master mirroring engine
+ENTRYPOINT ["/app/bulk_run.sh"]

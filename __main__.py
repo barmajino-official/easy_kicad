@@ -7,9 +7,6 @@ import re
 from textwrap import dedent
 from typing import List
 
-# 🛡️ Dynamic Path Injection: Ensure we can always find the package root
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
 from easy_kicad import __version__
 from easy_kicad.database.db_manager import DBManager
 from easy_kicad.easyeda.easyeda_api import EasyedaApi
