@@ -29,13 +29,19 @@ class EasyedaApi:
         delay = random.uniform(2.0, 7.0)
         time.sleep(delay)
         
-        max_retries = 1
+        max_retries = 2
         for attempt in range(max_retries + 1):
             try:
-                r = requests.get(url=API_ENDPOINT.format(lcsc_id=lcsc_id), headers=self.headers, timeout=10)
+                r = requests.get(url=API_ENDPOINT.format(lcsc_id=lcsc_id), headers=self.headers, timeout=12)
                 
                 if r.status_code == 200:
-                    api_response = r.json()
+                    try:
+                        api_response = r.json()
+                    except ValueError:
+                        logging.error(f"❌ Received non-JSON response for {lcsc_id}. Possible block.")
+                        time.sleep(30)
+                        continue
+
                     if not api_response or (
                         "code" in api_response and api_response["success"] is False
                     ):
@@ -43,24 +49,38 @@ class EasyedaApi:
                         return {}
                     return api_response
                 
-                # 🛑 Handle Rate Limiting (429) or Server Overload
-                if r.status_code == 429 or attempt < max_retries:
+                # 🛑 Handle Rate Limiting (429)
+                if r.status_code == 429:
+                    logging.warning(f"🚨 Rate Limited! Waiting 60s before retry... ({attempt+1}/{max_retries})")
+                    time.sleep(60)
+                    continue
+                
+                # 🛑 Handle Server Overload (5xx)
+                if r.status_code >= 500:
+                    logging.warning(f"⚠️ Server Error {r.status_code}. Waiting 15s... ({attempt+1}/{max_retries})")
+                    time.sleep(15)
+                    continue
+                
+                # 🛑 Handle Other Errors
+                if attempt < max_retries:
                     wait_time = 5 * (attempt + 1)
-                    logging.warning(f"⚠️ API Error {r.status_code} for {lcsc_id}. Waiting {wait_time}s and retrying... ({attempt+1}/{max_retries})")
+                    logging.warning(f"⚠️ API Error {r.status_code} for {lcsc_id}. Waiting {wait_time}s... ({attempt+1}/{max_retries})")
                     time.sleep(wait_time)
                     continue
                 else:
-                    logging.error(f"❌ API Error {r.status_code} for {lcsc_id}. Abandoning.")
+                    logging.error(f"❌ API Error {r.status_code} for {lcsc_id}. Giving up on this part.")
                     return {}
 
-            except (requests.exceptions.JSONDecodeError, ValueError) as e:
-                logging.error(f"❌ Invalid JSON received for {lcsc_id}: {e}")
-                return {}
+            except requests.exceptions.Timeout:
+                logging.warning(f"⏳ Timeout for {lcsc_id}. Waiting 10s... ({attempt+1}/{max_retries})")
+                time.sleep(10)
+                continue
             except Exception as e:
                 if attempt < max_retries:
-                    time.sleep(2)
+                    logging.warning(f"🔌 Connection error: {e}. Retrying in 5s...")
+                    time.sleep(5)
                     continue
-                logging.error(f"❌ Connection error for {lcsc_id}: {e}")
+                logging.error(f"❌ Fatal error for {lcsc_id}: {e}")
                 return {}
         return {}
 
