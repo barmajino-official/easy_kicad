@@ -3,7 +3,7 @@ import logging
 
 import requests
 
-from easyeda2kicad import __version__
+from barmajinokad import __version__
 
 API_ENDPOINT = "https://easyeda.com/api/products/{lcsc_id}/components?version=6.4.19.5"
 ENDPOINT_3D_MODEL = "https://modules.easyeda.com/3dmodel/{uuid}"
@@ -19,7 +19,7 @@ class EasyedaApi:
             "Accept-Encoding": "gzip, deflate",
             "Accept": "application/json, text/javascript, */*; q=0.01",
             "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
-            "User-Agent": f"easyeda2kicad v{__version__}",
+            "User-Agent": f"barmajinokad v{__version__}",
         }
 
     def get_info_from_easyeda_api(self, lcsc_id: str) -> dict:
@@ -40,22 +40,40 @@ class EasyedaApi:
             return {}
         return cp_cad_info["result"]
 
-    def get_raw_3d_model_obj(self, uuid: str) -> str:
-        r = requests.get(
-            url=ENDPOINT_3D_MODEL.format(uuid=uuid),
-            headers={"User-Agent": self.headers["User-Agent"]},
-        )
-        if r.status_code != requests.codes.ok:
-            logging.error(f"No raw 3D model data found for uuid:{uuid} on easyeda")
+    def _download_with_progress(self, url: str, label: str) -> bytes:
+        """Download a file with a manual progress bar."""
+        try:
+            r = requests.get(url, headers=self.headers, stream=True)
+            if r.status_code != 200:
+                return None
+            
+            total_size = int(r.headers.get('content-length', 0))
+            chunk_size = 1024 * 16 # 16KB
+            downloaded = 0
+            content = bytearray()
+            
+            for chunk in r.iter_content(chunk_size=chunk_size):
+                content.extend(chunk)
+                downloaded += len(chunk)
+                if total_size > 0:
+                    percent = int(100 * downloaded / total_size)
+                    bar = "#" * (percent // 10) + "-" * (10 - (percent // 10))
+                    print(f"\r  └─ {label}: [{bar}] {percent}% ({downloaded // 1024} KB / {total_size // 1024} KB)", end="", flush=True)
+            
+            if total_size > 0:
+                print() # New line after finishing
+            return bytes(content)
+        except Exception as e:
+            logging.error(f"Download error for {url}: {e}")
             return None
-        return r.content.decode()
+
+    def get_raw_3d_model_obj(self, uuid: str) -> str:
+        url = ENDPOINT_3D_MODEL.format(uuid=uuid)
+        content = self._download_with_progress(url, "Downloading OBJ")
+        if content:
+            return content.decode('utf-8', errors='ignore')
+        return None
 
     def get_step_3d_model(self, uuid: str) -> bytes:
-        r = requests.get(
-            url=ENDPOINT_3D_MODEL_STEP.format(uuid=uuid),
-            headers={"User-Agent": self.headers["User-Agent"]},
-        )
-        if r.status_code != requests.codes.ok:
-            logging.error(f"No step 3D model data found for uuid:{uuid} on easyeda")
-            return None
-        return r.content
+        url = ENDPOINT_3D_MODEL_STEP.format(uuid=uuid)
+        return self._download_with_progress(url, "Downloading STEP")

@@ -1,6 +1,6 @@
 # barmajinokad: Tool Settings & Configuration Reference
 
-This document centralizes the static configurations, API constants, and design parameters used by the `barmajinokad` / `easyeda2kicad` conversion engine.
+This document centralizes the static configurations, API constants, and design parameters used by the `barmajinokad` / `barmajinokad` conversion engine.
 
 ---
 
@@ -12,7 +12,7 @@ These endpoints are used to retrieve the raw component data from EasyEDA servers
 | `API_ENDPOINT` | `https://easyeda.com/api/products/{lcsc_id}/components?version=6.4.19.5` | [easyeda_api.py:8](file:///home/barmajino/.platformio/penv/lib/python3.12/site-packages/barmajinokad/easyeda/easyeda_api.py#L8) |
 | `ENDPOINT_3D_MODEL` | `https://modules.easyeda.com/3dmodel/{uuid}` | [easyeda_api.py:9](file:///home/barmajino/.platformio/penv/lib/python3.12/site-packages/barmajinokad/easyeda/easyeda_api.py#L9) |
 | `ENDPOINT_3D_MODEL_STEP` | `https://modules.easyeda.com/qAxj6KHrDKw4blvCG8QJPs7Y/{uuid}` | [easyeda_api.py:10](file:///home/barmajino/.platformio/penv/lib/python3.12/site-packages/barmajinokad/easyeda/easyeda_api.py#L10) |
-| `User-Agent` | `easyeda2kicad v{version}` | [easyeda_api.py:22](file:///home/barmajino/.platformio/penv/lib/python3.12/site-packages/barmajinokad/easyeda/easyeda_api.py#L22) |
+| `User-Agent` | `barmajinokad v{version}` | [easyeda_api.py:22](file:///home/barmajino/.platformio/penv/lib/python3.12/site-packages/barmajinokad/easyeda/easyeda_api.py#L22) |
 
 ---
 
@@ -64,10 +64,10 @@ These endpoints are used to retrieve the raw component data from EasyEDA servers
 ## 4. Default File System Paths
 If not specified via `--output` flag, the tools use the following defaults:
 
-- **Root Library Folder**: `~/Documents/Kicad/easyeda2kicad/`
-- **Footprint Library**: `easyeda2kicad.pretty`
-- **3D Shapes Folder**: `easyeda2kicad.3dshapes`
-- **Symbol Library**: `easyeda2kicad.kicad_sym` (V6) or `easyeda2kicad.lib` (V5)
+- **Root Library Folder**: `~/Documents/Kicad/barmajinokad/`
+- **Footprint Library**: `barmajinokad.pretty`
+- **3D Shapes Folder**: `barmajinokad.3dshapes`
+- **Symbol Library**: `barmajinokad.kicad_sym` (V6) or `barmajinokad.lib` (V5)
 
 ---
 

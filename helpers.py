@@ -7,8 +7,8 @@ import re
 from datetime import datetime
 from glob import escape
 
-from easyeda2kicad import __version__
-from easyeda2kicad.kicad.parameters_kicad_symbol import KicadVersion, sanitize_fields
+from barmajinokad import __version__
+from barmajinokad.kicad.parameters_kicad_symbol import KicadVersion, sanitize_fields
 
 sym_lib_regex_pattern = {
     "v5": r"(#\n# {component_name}\n#\n.*?ENDDEF\n)",
@@ -83,7 +83,7 @@ def update_component_in_symbol_lib_file(
 
         new_lib = new_lib.replace(
             "(generator kicad_symbol_editor)",
-            "(generator https://github.com/uPesy/easyeda2kicad.py)",
+            "(generator https://github.com/uPesy/barmajinokad.py)",
         )
 
     with open(file=lib_path, mode="w", encoding="utf-8") as lib_file:
@@ -111,23 +111,23 @@ def add_component_in_symbol_lib_file(
             lib_file.write(
                 new_lib_data.replace(
                     "(generator kicad_symbol_editor)",
-                    "(generator https://github.com/uPesy/easyeda2kicad.py)",
+                    "(generator https://github.com/uPesy/barmajinokad.py)",
                 )
             )
 
 
 def get_local_config() -> dict:
-    if not os.path.isfile("easyeda2kicad_config.json"):
-        with open(file="easyeda2kicad_config.json", mode="w", encoding="utf-8") as conf:
+    if not os.path.isfile("barmajinokad_config.json"):
+        with open(file="barmajinokad_config.json", mode="w", encoding="utf-8") as conf:
             json.dump(
                 {"updated_at": datetime.utcnow().timestamp(), "version": __version__},
                 conf,
                 indent=4,
                 ensure_ascii=False,
             )
-        logging.info("Create easyeda2kicad_config.json config file")
+        logging.info("Create barmajinokad_config.json config file")
 
-    with open(file="easyeda2kicad_config.json", encoding="utf-8") as conf:
+    with open(file="barmajinokad_config.json", encoding="utf-8") as conf:
         local_conf: dict = json.load(conf)
 
     return local_conf
@@ -167,3 +167,62 @@ def get_middle_arc_pos(
     middle_x = center_x + radius * math.cos((angle_start + angle_end) / 2)
     middle_y = center_y + radius * math.sin((angle_start + angle_end) / 2)
     return middle_x, middle_y
+
+
+def update_kicad_lib_tables(output_dir: str):
+    """
+    Scans output_dir for .kicad_sym files and .pretty folders
+    and generates sym-lib-table and fp-lib-table in the same directory.
+    """
+    output_dir = os.path.abspath(output_dir)
+    sym_table_path = os.path.join(output_dir, "sym-lib-table")
+    fp_table_path = os.path.join(output_dir, "fp-lib-table")
+
+    # 1. Update Symbol Table
+    sym_libs = sorted([f for f in os.listdir(output_dir) if f.endswith(".kicad_sym")])
+    sym_table_content = ["(sym_lib_table"]
+    for lib in sym_libs:
+        nickname = lib.replace(".kicad_sym", "")
+        # Using absolute paths ensures KiCad always finds the files
+        uri = os.path.join(output_dir, lib)
+        sym_table_content.append(
+            f'  (lib (name "{nickname}")(type "KiCad")(uri "{uri}")(options "")(descr ""))'
+        )
+    sym_table_content.append(")")
+
+    with open(sym_table_path, "w", encoding="utf-8") as f:
+        f.write("\n".join(sym_table_content))
+    
+    # Touch the file to signal KiCad's watcher
+    try:
+        os.utime(sym_table_path, None)
+    except Exception:
+        pass
+
+    # 2. Update Footprint Table
+    fp_libs = sorted(
+        [
+            f
+            for f in os.listdir(output_dir)
+            if f.endswith(".pretty") and os.path.isdir(os.path.join(output_dir, f))
+        ]
+    )
+    fp_table_content = ["(fp_lib_table"]
+    for lib in fp_libs:
+        nickname = lib.replace(".pretty", "")
+        uri = os.path.join(output_dir, lib)
+        fp_table_content.append(
+            f'  (lib (name "{nickname}")(type "KiCad")(uri "{uri}")(options "")(descr ""))'
+        )
+    fp_table_content.append(")")
+
+    with open(fp_table_path, "w", encoding="utf-8") as f:
+        f.write("\n".join(fp_table_content))
+
+    # Touch the file to signal KiCad's watcher
+    try:
+        os.utime(fp_table_path, None)
+    except Exception:
+        pass
+
+    logging.info(f"Updated KiCad master library tables in {output_dir}")

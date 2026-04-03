@@ -2,8 +2,8 @@
 import json
 import logging
 
-from easyeda2kicad.easyeda.easyeda_api import EasyedaApi
-from easyeda2kicad.easyeda.parameters_easyeda import *
+from barmajinokad.easyeda.easyeda_api import EasyedaApi
+from barmajinokad.easyeda.parameters_easyeda import *
 
 
 def add_easyeda_pin(pin_data: str, ee_symbol: EeSymbol):
@@ -108,10 +108,14 @@ easyeda_handlers = {
 class EasyedaSymbolImporter:
     def __init__(self, easyeda_cp_cad_data: dict):
         self.input = easyeda_cp_cad_data
-        self.output: EeSymbol = self.extract_easyeda_data(
-            ee_data=easyeda_cp_cad_data,
-            ee_data_info=easyeda_cp_cad_data["dataStr"]["head"]["c_para"],
-        )
+        if "dataStr" in easyeda_cp_cad_data:
+            self.output: EeSymbol = self.extract_easyeda_data(
+                ee_data=easyeda_cp_cad_data,
+                ee_data_info=easyeda_cp_cad_data["dataStr"]["head"]["c_para"],
+            )
+        else:
+            self.output = None
+            logging.warning("No symbol data (dataStr) found in CAD data.")
 
     def get_symbol(self) -> EeSymbol:
         return self.output
@@ -146,12 +150,16 @@ class EasyedaSymbolImporter:
 class EasyedaFootprintImporter:
     def __init__(self, easyeda_cp_cad_data: dict):
         self.input = easyeda_cp_cad_data
-        self.output = self.extract_easyeda_data(
-            ee_data_str=self.input["packageDetail"]["dataStr"],
-            ee_data_info=self.input["packageDetail"]["dataStr"]["head"]["c_para"],
-            is_smd=self.input.get("SMT")
-            and "-TH_" not in self.input["packageDetail"]["title"],
-        )
+        if "packageDetail" in self.input and "dataStr" in self.input["packageDetail"]:
+            self.output = self.extract_easyeda_data(
+                ee_data_str=self.input["packageDetail"]["dataStr"],
+                ee_data_info=self.input["packageDetail"]["dataStr"]["head"]["c_para"],
+                is_smd=self.input.get("SMT")
+                and "-TH_" not in self.input["packageDetail"]["title"],
+            )
+        else:
+            self.output = None
+            logging.warning("No footprint data (packageDetail/dataStr) found in CAD data.")
 
     def get_footprint(self):
         return self.output
@@ -239,11 +247,14 @@ class Easyeda3dModelImporter:
         self.output = self.create_3d_model()
 
     def create_3d_model(self) -> Union[Ee3dModel, None]:
-        ee_data = (
-            self.input["packageDetail"]["dataStr"]["shape"]
-            if isinstance(self.input, dict)
-            else self.input
-        )
+        if isinstance(self.input, dict):
+            if "packageDetail" in self.input and "dataStr" in self.input["packageDetail"]:
+                ee_data = self.input["packageDetail"]["dataStr"]["shape"]
+            else:
+                logging.warning("No 3D model data found (missing packageDetail/dataStr)")
+                return None
+        else:
+            ee_data = self.input
 
         if model_3d_info := self.get_3d_model_info(ee_data=ee_data):
             model_3d: Ee3dModel = self.parse_3d_model_info(info=model_3d_info)

@@ -1,8 +1,8 @@
-# easyeda2kicad Analysis Report
+# barmajinokad Analysis Report
 
 ## Overview
 
-This report documents an analysis of the easyeda2kicad tool, focusing on font size control, component organization, and metadata support in KiCad libraries.
+This report documents an analysis of the barmajinokad tool, focusing on font size control, component organization, and metadata support in KiCad libraries.
 
 ## Questions and Findings
 
@@ -60,7 +60,7 @@ This report documents an analysis of the easyeda2kicad tool, focusing on font si
 
 **Question**: Does KiCad support keywords, description, category for search matching?
 
-**Answer**: YES, KiCad supports these features, but easyeda2kicad doesn't extract them from the API.
+**Answer**: YES, KiCad supports these features, but barmajinokad doesn't extract them from the API.
 
 **API Data Available** (from testing):
 
@@ -105,9 +105,9 @@ info=EeSymbolInfo(
 **Command**:
 
 ```bash
-cd /home/barmajino/.platformio/penv/lib/python3.12/site-packages/easyeda2kicad && python -c "
+cd /home/barmajino/.platformio/penv/lib/python3.12/site-packages/barmajinokad && python -c "
 import json
-from easyeda2kicad.easyeda.easyeda_api import EasyedaApi
+from barmajinokad.easyeda.easyeda_api import EasyedaApi
 
 api = EasyedaApi()
 try:
@@ -162,4 +162,4 @@ lcsc keys: ['id', 'number', 'step', 'min', 'price', 'stock', 'url']
 
 ## Conclusion
 
-The easyeda2kicad tool provides basic conversion functionality but misses opportunities for better KiCad integration through metadata support and organization features. The underlying KiCad format supports rich metadata, but the tool doesn't leverage it.
+The barmajinokad tool provides basic conversion functionality but misses opportunities for better KiCad integration through metadata support and organization features. The underlying KiCad format supports rich metadata, but the tool doesn't leverage it.
