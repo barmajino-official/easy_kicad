@@ -1,6 +1,7 @@
 # Global imports
 import logging
 import time
+import random
 import requests
 
 from easy_kicad import __version__
@@ -24,8 +25,9 @@ class EasyedaApi:
         }
 
     def get_info_from_easyeda_api(self, lcsc_id: str) -> dict:
-        # ⚡ Anti-Blocking: Short delay between parts
-        time.sleep(1.0)
+        # ⚡ Anti-Blocking: Random delay between parts (2 to 7 seconds)
+        delay = random.uniform(2.0, 7.0)
+        time.sleep(delay)
         
         max_retries = 1
         for attempt in range(max_retries + 1):
