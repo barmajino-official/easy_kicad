@@ -7,8 +7,8 @@ import re
 from datetime import datetime
 from glob import escape
 
-from barmajinokad import __version__
-from barmajinokad.kicad.parameters_kicad_symbol import KicadVersion, sanitize_fields
+from easy_kicad import __version__
+from easy_kicad.kicad.parameters_kicad_symbol import KicadVersion, sanitize_fields
 
 sym_lib_regex_pattern = {
     "v5": r"(#\n# {component_name}\n#\n.*?ENDDEF\n)",
@@ -83,7 +83,7 @@ def update_component_in_symbol_lib_file(
 
         new_lib = new_lib.replace(
             "(generator kicad_symbol_editor)",
-            "(generator https://github.com/uPesy/barmajinokad.py)",
+            "(generator https://github.com/uPesy/easy_kicad.py)",
         )
 
     with open(file=lib_path, mode="w", encoding="utf-8") as lib_file:
@@ -111,23 +111,23 @@ def add_component_in_symbol_lib_file(
             lib_file.write(
                 new_lib_data.replace(
                     "(generator kicad_symbol_editor)",
-                    "(generator https://github.com/uPesy/barmajinokad.py)",
+                    "(generator https://github.com/uPesy/Easy-KiCad.py)",
                 )
             )
 
 
 def get_local_config() -> dict:
-    if not os.path.isfile("barmajinokad_config.json"):
-        with open(file="barmajinokad_config.json", mode="w", encoding="utf-8") as conf:
+    if not os.path.isfile("easykicad_config.json"):
+        with open(file="easykicad_config.json", mode="w", encoding="utf-8") as conf:
             json.dump(
                 {"updated_at": datetime.utcnow().timestamp(), "version": __version__},
                 conf,
                 indent=4,
                 ensure_ascii=False,
             )
-        logging.info("Create barmajinokad_config.json config file")
+        logging.info("Create easykicad_config.json config file")
 
-    with open(file="barmajinokad_config.json", encoding="utf-8") as conf:
+    with open(file="easykicad_config.json", encoding="utf-8") as conf:
         local_conf: dict = json.load(conf)
 
     return local_conf

@@ -1,13 +1,13 @@
-# Barmajinokad - High-Performance KiCad Library Mirroring Tool
+# Easy-KiCad - High-Performance KiCad Library Mirroring Tool
 
-Barmajinokad is a powerful tool designed to mirror electronic components from the LCSC/EasyEDA catalog directly into native KiCad 8.0+ libraries.
+Easy-KiCad is a powerful tool designed to mirror electronic components from the LCSC/EasyEDA catalog directly into native KiCad 8.0+ libraries.
 
 ## 🚀 Quick Start
 
 To mirror components based on a search term:
 
 ```bash
-python3 -m barmajinokad --match="esp32" --full
+python3 -m easy-kicad --match="esp32" --full
 ```
 
 ### Command Flags
@@ -47,8 +47,12 @@ The tool automatically sorts components into logical libraries based on their me
 ## 🔌 Integration with KiCad
 
 To use the mirrored library in KiCad:
-1. Open KiCad.
+1. Open Easy-KiCad.
 2. Go to **Preferences** -> **Manage Symbol Libraries**.
 3. Add a new library using the `outputFile/sym-lib-table`.
 4. Go to **Preferences** -> **Manage Footprint Libraries**.
 5. Add a new library using the `outputFile/fp-lib-table`.
+
+*Note: In KiCad, follow step 2-5 to register the libraries.*
+
+*Note: This tool was previously known as barmajinokad.*

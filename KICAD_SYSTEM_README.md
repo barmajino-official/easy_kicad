@@ -1,6 +1,6 @@
 # KiCad Library Generation & Table Management
 
-This document explains how the `barmajinokad` tools dynamically generate and maintain KiCad's library "tables" (internal symbol structures and footprint directories).
+This document explains how the `easy_kicad` tools dynamically generate and maintain KiCad's library "tables" (internal symbol structures and footprint directories).
 
 ---
 

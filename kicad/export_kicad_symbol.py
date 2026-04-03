@@ -2,7 +2,7 @@
 import logging
 from typing import Callable, List, Tuple, Union
 
-from barmajinokad.easyeda.parameters_easyeda import (
+from easy_kicad.easyeda.parameters_easyeda import (
     EasyedaPinType,
     EeSymbol,
     EeSymbolArc,
@@ -15,10 +15,10 @@ from barmajinokad.easyeda.parameters_easyeda import (
     EeSymbolPolyline,
     EeSymbolRectangle,
 )
-from barmajinokad.easyeda.svg_path_parser import SvgPathEllipticalArc, SvgPathMoveTo
-from barmajinokad.helpers import get_middle_arc_pos
-from barmajinokad.kicad.export_kicad_footprint import compute_arc
-from barmajinokad.kicad.parameters_kicad_symbol import *
+from easy_kicad.easyeda.svg_path_parser import SvgPathEllipticalArc, SvgPathMoveTo
+from easy_kicad.helpers import get_middle_arc_pos
+from easy_kicad.kicad.export_kicad_footprint import compute_arc
+from easy_kicad.kicad.parameters_kicad_symbol import *
 
 ee_pin_type_to_ki_pin_type = {
     EasyedaPinType.unspecified: KiPinType.unspecified,

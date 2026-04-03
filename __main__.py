@@ -7,16 +7,16 @@ import sys
 from textwrap import dedent
 from typing import List
 
-from barmajinokad import __version__
-from barmajinokad.database.db_manager import DBManager
-from barmajinokad.easyeda.easyeda_api import EasyedaApi
-from barmajinokad.easyeda.easyeda_importer import (
+from easy_kicad import __version__
+from easy_kicad.database.db_manager import DBManager
+from easy_kicad.easyeda.easyeda_api import EasyedaApi
+from easy_kicad.easyeda.easyeda_importer import (
     Easyeda3dModelImporter,
     EasyedaFootprintImporter,
     EasyedaSymbolImporter,
 )
-from barmajinokad.easyeda.parameters_easyeda import EeSymbol
-from barmajinokad.helpers import (
+from easy_kicad.easyeda.parameters_easyeda import EeSymbol
+from easy_kicad.helpers import (
     add_component_in_symbol_lib_file,
     get_local_config,
     id_already_in_symbol_lib,
@@ -24,10 +24,10 @@ from barmajinokad.helpers import (
     update_component_in_symbol_lib_file,
     update_kicad_lib_tables,
 )
-from barmajinokad.kicad.export_kicad_3d_model import Exporter3dModelKicad
-from barmajinokad.kicad.export_kicad_footprint import ExporterFootprintKicad
-from barmajinokad.kicad.export_kicad_symbol import ExporterSymbolKicad
-from barmajinokad.kicad.parameters_kicad_symbol import KicadVersion
+from easy_kicad.kicad.export_kicad_3d_model import Exporter3dModelKicad
+from easy_kicad.kicad.export_kicad_footprint import ExporterFootprintKicad
+from easy_kicad.kicad.export_kicad_symbol import ExporterSymbolKicad
+from easy_kicad.kicad.parameters_kicad_symbol import KicadVersion
 
 
 def get_parser() -> argparse.ArgumentParser:
@@ -35,7 +35,7 @@ def get_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         description=(
             "A Python script that convert any electronic components from LCSC or"
-            " EasyEDA to a Kicad library"
+            " EasyEDA to a Easy-KiCad library"
         )
     )
 
@@ -125,8 +125,8 @@ def valid_arguments(arguments: dict) -> bool:
     if not any([arguments["symbol"], arguments["footprint"], arguments["3d"]]):
         logging.error(
             "Missing action arguments\n"
-            "  barmajinokad --lcsc_id=C2040 --footprint\n"
-            "  barmajinokad --lcsc_id=C2040 --symbol"
+            "  easy_kicad --lcsc_id=C2040 --footprint\n"
+            "  easy_kicad --lcsc_id=C2040 --symbol"
         )
         return False
 
@@ -136,7 +136,7 @@ def valid_arguments(arguments: dict) -> bool:
     if arguments["project_relative"] and not arguments["output"]:
         logging.error(
             "A project specific library path should be given with --output option when"
-            " using --project-relative option\nFor example: barmajinokad"
+            " using --project-relative option\nFor example: easy_kicad"
             " --lcsc_id=C2040 --full"
             " --output=C:/Users/your_username/Documents/Kicad/6.0/projects/my_project"
             " --project-relative"
@@ -163,7 +163,7 @@ def valid_arguments(arguments: dict) -> bool:
             os.makedirs(default_folder, exist_ok=True)
 
         base_folder = default_folder
-        lib_name = "barmajinokad"
+        lib_name = "easy_kicad"
         arguments["use_default_folder"] = True
 
     arguments["output"] = os.path.join(base_folder, lib_name)
@@ -188,7 +188,7 @@ def valid_arguments(arguments: dict) -> bool:
                     """\
                 (kicad_symbol_lib
                   (version 20211014)
-                  (generator https://github.com/uPesy/barmajinokad.py)
+                  (generator https://github.com/uPesy/easy_kicad.py)
                 )"""
                 )
                 if kicad_version == KicadVersion.v6
@@ -223,7 +223,7 @@ def fp_already_in_footprint_lib(lib_path: str, package_name: str) -> bool:
 
 
 def main(argv: List[str] = sys.argv[1:]) -> int:
-    print(f"-- barmajinokad.py v{__version__} --")
+    print(f"-- Easy-KiCad v{__version__} --")
 
     # cli interface
     parser = get_parser()

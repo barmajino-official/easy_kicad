@@ -1,6 +1,6 @@
 # KiCad Specifications & Grammar Mastery
 
-This document is a technical synthesis of the official KiCad documentation found in the `refers/` directory. It explains the "Blueprints" that the `barmajinokad` tool must follow to ensure 100% compatibility with KiCad 6.0 and 7.0.
+This document is a technical synthesis of the official KiCad documentation found in the `refers/` directory. It explains the "Blueprints" that the `easy_kicad` tool must follow to ensure 100% compatibility with KiCad 6.0 and 7.0.
 
 ---
 
@@ -8,7 +8,7 @@ This document is a technical synthesis of the official KiCad documentation found
 
 The `refers/` folder contains seven core technical documents which act as the absolute grammar for all KiCad files.
 
-| File | Specs Category | Implementation in `barmajinokad` |
+| File | Specs Category | Implementation in `easy_kicad` |
 | :--- | :--- | :--- |
 | **`1.txt`** | **Master S-Expression Grammar** | Defines `at`, `pts`, `stroke`, and `effects` templates. |
 | **`2.txt`** | **Footprint Library Spec** | Logic for `.kicad_mod` files and `.pretty` folder creation. |

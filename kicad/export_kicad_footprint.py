@@ -3,8 +3,8 @@ import logging
 from math import acos, cos, isnan, pi, sin, sqrt
 from typing import Tuple, Union
 
-from barmajinokad.easyeda.parameters_easyeda import ee_footprint
-from barmajinokad.kicad.parameters_kicad_footprint import *
+from easy_kicad.easyeda.parameters_easyeda import ee_footprint
+from easy_kicad.kicad.parameters_kicad_footprint import *
 
 # ---------------------------------------
 
@@ -468,7 +468,7 @@ class ExporterFootprintKicad:
         ki_lib = ""
 
         ki_lib += KI_MODULE_INFO.format(
-            package_lib="barmajinokad", package_name=ki.info.name, edit="5DC5F6A4"
+            package_lib="easy_kicad", package_name=ki.info.name, edit="5DC5F6A4"
         )
 
         if ki.info.fp_type:

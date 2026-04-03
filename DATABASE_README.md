@@ -1,7 +1,7 @@
-# barmajinokad Database Overview
+# easy_kicad Database Overview
 
 ## File Information
-- **Location**: `/home/barmajino/.platformio/penv/lib/python3.12/site-packages/barmajinokad/database/easykicadprovition.db`
+- **Location**: `/home/barmajino/.platformio/penv/lib/python3.12/site-packages/easy_kicad/database/easykicadprovition.db`
 - **Size**: ~1.3 GB
 - **Type**: SQLite 3
 
@@ -45,7 +45,7 @@ The primary data table containing part details and synchronization state.
 ---
 
 ## Tool Integration
-The `barmajinokad` engine uses this database to:
+The `easy_kicad` engine uses this database to:
 1. **Accelerate Lookups**: Instead of hitting the EasyEDA API for every query, the tool first checks this local mirror.
 2. **Track Mirroring Progress**: The `is_downloaded` and `error_log` fields are used by the "War-Engine" (async worker engine) to identify which parts need to be processed or re-certified.
 3. **Query Interface**: Supports complex search across the 1.1M parts using the `description` and `manufacturer` indices.
