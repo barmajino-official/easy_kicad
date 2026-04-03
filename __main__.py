@@ -282,7 +282,15 @@ def main(argv: List[str] = sys.argv[1:]) -> int:
 
     # --- PROCESS EACH COMPONENT ---
     total_parts = len(lcsc_ids)
+    import random as rand_lib # To avoid confusion with the random delay logic
+    
     for index, component_id in enumerate(lcsc_ids, 1):
+        # 🧘 HUMAN BREAK: Every 20 parts, take a long pause (30-90s)
+        if index > 1 and index % 20 == 0:
+            break_time = rand_lib.uniform(30.0, 90.0)
+            logging.info(f"🧘 Taking a Human Break for {int(break_time)}s to avoid detection...")
+            time.sleep(break_time)
+
         # Get Metadata for categorization and skipping
         metadata = db.get_part_metadata(component_id)
         progress_str = f"[{index}/{total_parts}]"

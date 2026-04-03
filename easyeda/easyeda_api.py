@@ -34,22 +34,21 @@ class EasyedaApi:
         }
 
     def get_info_from_easyeda_api(self, lcsc_id: str) -> dict:
-        # ⚡ Anti-Blocking: Random delay between parts (2 to 7 seconds)
-        delay = random.uniform(2.0, 7.0)
+        # ⚡ Enhanced Stealth Delay: Randomize between 4 to 12 seconds
+        delay = random.uniform(4.0, 12.0)
         time.sleep(delay)
         
-        max_retries = 2
+        max_retries = 3
         for attempt in range(max_retries + 1):
             try:
-                # 🛡️ THE NUCLEAR OPTION: Using 'curl' directly
-                # Force IPv4 (-4) as sometimes Docker IPv6 triggers WAF blocks
+                # 🛡️ THE NUCLEAR OPTION: Using 'curl' directly with a longer timeout
                 url = API_ENDPOINT.format(lcsc_id=lcsc_id)
                 cmd = [
                     "curl", "-s", "-L", "-4",
                     "-A", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
                     "-H", "Referer: https://easyeda.com/editor",
                     "-H", "Accept: application/json",
-                    "--max-time", "15",
+                    "--max-time", "30",
                     url
                 ]
                 
@@ -59,8 +58,9 @@ class EasyedaApi:
                     try:
                         api_response = json.loads(result.stdout)
                     except json.JSONDecodeError:
-                        logging.error(f"❌ Received non-JSON response from curl for {lcsc_id}. Possible block. Body: {result.stdout[:200]}")
-                        time.sleep(30)
+                        # 🧊 COOLING DOWN: If we get HTML instead of JSON, we ARE being rate-limited.
+                        logging.warning(f"❌ Rate-limiting detected for {lcsc_id}. Initiating 60s cooldown...")
+                        time.sleep(60)
                         continue
 
                     if not api_response or (
@@ -71,14 +71,14 @@ class EasyedaApi:
                     return api_response
                 
                 # Handle curl errors
-                logging.warning(f"⚠️ Curl failed with code {result.returncode} for {lcsc_id}. Error: {result.stderr[:100]}")
+                logging.warning(f"⚠️ Curl failed with code {result.returncode} for {lcsc_id}. Retrying in 10s...")
                 time.sleep(10)
                 continue
 
             except Exception as e:
                 if attempt < max_retries:
-                    logging.warning(f"🔌 Connection error in curl bridge: {e}. Retrying in 5s...")
-                    time.sleep(5)
+                    logging.warning(f"🔌 Connection error in curl bridge: {e}. Retrying in 10s...")
+                    time.sleep(10)
                     continue
                 logging.error(f"❌ Fatal error for {lcsc_id}: {e}")
                 return {}
