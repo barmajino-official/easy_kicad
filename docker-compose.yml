@@ -4,8 +4,8 @@ services:
     image: easy-kicad:latest
     container_name: easy-kicad-distributor
     volumes:
-      - ./database:/app/easy_kicad/database
-      - ./outputFile:/app/easy_kicad/outputFile
+      - ./database:/app/database
+      - ./outputFile:/app/outputFile
     # Override the entrypoint to run our bulk search script
     entrypoint: /app/easy_kicad/bulk_run.sh
     environment:
