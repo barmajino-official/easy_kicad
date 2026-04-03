@@ -23,7 +23,6 @@ from barmajinokad.helpers import (
     set_logger,
     update_component_in_symbol_lib_file,
     update_kicad_lib_tables,
-    update_readme,
 )
 from barmajinokad.kicad.export_kicad_3d_model import Exporter3dModelKicad
 from barmajinokad.kicad.export_kicad_footprint import ExporterFootprintKicad
@@ -427,20 +426,6 @@ def main(argv: List[str] = sys.argv[1:]) -> int:
         # FINAL STEP: MARK AS MIRRORED IN DB
         db.mark_mirrored(component_id)
         
-        # README AUTOMATION
-        comp_name_for_readme = component_id
-        if easyeda_symbol:
-            comp_name_for_readme = easyeda_symbol.info.name
-        elif easyeda_footprint:
-            comp_name_for_readme = easyeda_footprint.info.name
-
-        update_readme(
-            output_dir=output_base_folder,
-            lcsc_id=component_id,
-            component_name=comp_name_for_readme,
-            description=metadata['description'] if metadata else "N/A"
-        )
-
         logging.info(f"== Finished Part {component_id}. Persistent state saved. ==")
 
     # REBUILD MASTER TABLES AT THE END
