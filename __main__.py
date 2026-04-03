@@ -160,18 +160,25 @@ def valid_arguments(arguments: dict) -> bool:
         return False
 
     if arguments["output"]:
-        base_folder = "/".join(arguments["output"].replace("\\", "/").split("/")[:-1])
-        lib_name = (
-            arguments["output"]
-            .replace("\\", "/")
-            .split("/")[-1]
-            .split(".lib")[0]
-            .split(".kicad_sym")[0]
-        )
+        # Standardize path
+        clean_output = arguments["output"].replace("\\", "/")
+        
+        if clean_output.endswith("/") or os.path.isdir(clean_output):
+            # It's a directory!
+            base_folder = clean_output.rstrip("/")
+            lib_name = "easy_kicad"
+        else:
+            # It's a file prefix path (e.g. /app/outputFile/my_lib)
+            parts = clean_output.split("/")
+            base_folder = "/".join(parts[:-1])
+            lib_name = parts[-1]
 
         if not os.path.isdir(base_folder):
-            logging.error(f"Can't find the folder : {base_folder}")
-            return False
+            try:
+                os.makedirs(base_folder, exist_ok=True)
+            except Exception:
+                logging.error(f"Can't create or find folder: {base_folder}")
+                return False
     else:
         # Use a consistent absolute path for the default folder
         default_folder = os.path.abspath("outputFile")

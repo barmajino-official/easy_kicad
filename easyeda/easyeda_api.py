@@ -90,40 +90,37 @@ class EasyedaApi:
             return {}
         return cp_cad_info["result"]
 
-    def _download_with_progress(self, url: str, label: str) -> bytes:
-        """Download a file with a manual progress bar."""
+    def _download_with_curl(self, url: str, label: str) -> bytes:
+        """Download a file using the curl bridge to bypass redirect loops and WAF."""
         try:
-            r = requests.get(url, headers=self.headers, stream=True)
-            if r.status_code != 200:
-                return None
+            # -L follows redirects, -4 forces IPv4, -s is silent
+            cmd = [
+                "curl", "-s", "-L", "-4",
+                "-A", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+                "-H", "Referer: https://easyeda.com/editor",
+                "--max-time", "60",
+                url
+            ]
+            print(f"  └─ {label}: Initiating curl download...", end="", flush=True)
+            result = subprocess.run(cmd, capture_output=True)
             
-            total_size = int(r.headers.get('content-length', 0))
-            chunk_size = 1024 * 16 # 16KB
-            downloaded = 0
-            content = bytearray()
+            if result.returncode == 0 and len(result.stdout) > 0:
+                print(f" Done ({len(result.stdout) // 1024} KB)")
+                return result.stdout
             
-            for chunk in r.iter_content(chunk_size=chunk_size):
-                content.extend(chunk)
-                downloaded += len(chunk)
-                if total_size > 0:
-                    percent = int(100 * downloaded / total_size)
-                    bar = "#" * (percent // 10) + "-" * (10 - (percent // 10))
-                    print(f"\r  └─ {label}: [{bar}] {percent}% ({downloaded // 1024} KB / {total_size // 1024} KB)", end="", flush=True)
-            
-            if total_size > 0:
-                print() # New line after finishing
-            return bytes(content)
+            logging.error(f"\n❌ Curl download failed for {url}. Code: {result.returncode}")
+            return None
         except Exception as e:
-            logging.error(f"Download error for {url}: {e}")
+            logging.error(f"\n❌ Fatal error in curl download: {e}")
             return None
 
     def get_raw_3d_model_obj(self, uuid: str) -> str:
         url = ENDPOINT_3D_MODEL.format(uuid=uuid)
-        content = self._download_with_progress(url, "Downloading OBJ")
+        content = self._download_with_curl(url, "Downloading OBJ")
         if content:
             return content.decode('utf-8', errors='ignore')
         return None
 
     def get_step_3d_model(self, uuid: str) -> bytes:
         url = ENDPOINT_3D_MODEL_STEP.format(uuid=uuid)
-        return self._download_with_progress(url, "Downloading STEP")
+        return self._download_with_curl(url, "Downloading STEP")
