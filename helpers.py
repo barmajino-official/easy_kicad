@@ -7,6 +7,10 @@ import re
 from datetime import datetime
 from glob import escape
 
+__version__ = "0.8.0"
+__author__ = "uPesy"
+__email__ = "contact@upesy.com"
+
 from kicad.parameters_kicad_symbol import KicadVersion, sanitize_fields
 
 sym_lib_regex_pattern = {
