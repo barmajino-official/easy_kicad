@@ -23,16 +23,25 @@ class EasyedaApi:
         }
 
     def get_info_from_easyeda_api(self, lcsc_id: str) -> dict:
-        r = requests.get(url=API_ENDPOINT.format(lcsc_id=lcsc_id), headers=self.headers)
-        api_response = r.json()
-
-        if not api_response or (
-            "code" in api_response and api_response["success"] is False
-        ):
-            logging.debug(f"{api_response}")
+        try:
+            r = requests.get(url=API_ENDPOINT.format(lcsc_id=lcsc_id), headers=self.headers)
+            if r.status_code != 200:
+                logging.debug(f"API Error {r.status_code} for {lcsc_id}")
+                return {}
+            
+            api_response = r.json()
+            if not api_response or (
+                "code" in api_response and api_response["success"] is False
+            ):
+                logging.debug(f"{api_response}")
+                return {}
+            return api_response
+        except (requests.exceptions.JSONDecodeError, ValueError) as e:
+            logging.error(f"Failed to parse JSON for {lcsc_id}: {e}")
             return {}
-
-        return r.json()
+        except Exception as e:
+            logging.error(f"Unexpected error fetching {lcsc_id}: {e}")
+            return {}
 
     def get_cad_data_of_component(self, lcsc_id: str) -> dict:
         cp_cad_info = self.get_info_from_easyeda_api(lcsc_id=lcsc_id)
