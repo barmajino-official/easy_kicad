@@ -16,12 +16,19 @@ ENDPOINT_3D_MODEL_STEP = "https://modules.easyeda.com/qAxj6KHrDKw4blvCG8QJPs7Y/{
 
 class EasyedaApi:
     def __init__(self) -> None:
-        # Standard browser User-Agent to avoid early blocking
+        # 🌐 Perfect Browser Mimicry
         self.headers = {
-            "Accept-Encoding": "gzip, deflate",
             "Accept": "application/json, text/javascript, */*; q=0.01",
+            "Accept-Encoding": "gzip, deflate, br",
+            "Accept-Language": "en-US,en;q=0.9",
+            "Cache-Control": "no-cache",
+            "Connection": "keep-alive",
             "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
+            "Host": "easyeda.com",
+            "Pragma": "no-cache",
+            "Referer": "https://easyeda.com/editor",
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+            "X-Requested-With": "XMLHttpRequest",
         }
 
     def get_info_from_easyeda_api(self, lcsc_id: str) -> dict:
@@ -45,7 +52,7 @@ class EasyedaApi:
                     if not api_response or (
                         "code" in api_response and api_response["success"] is False
                     ):
-                        logging.debug(f"API Error Response for {lcsc_id}: {api_response}")
+                        logging.warning(f"⚠️ EasyEDA Server returned failure for {lcsc_id}: {api_response}")
                         return {}
                     return api_response
                 
