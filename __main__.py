@@ -112,7 +112,7 @@ def get_parser() -> argparse.ArgumentParser:
         "--db",
         required=False,
         help="Path to the SQLite database",
-        default="database/easy_kicad_catalog.db",
+        default=None,
         type=str,
     )
 
