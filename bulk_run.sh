@@ -12,8 +12,8 @@ for cat in $CATEGORIES; do
     echo "⚡ Processing: $cat"
     echo "------------------------------------------------------------"
     
-    # Run the flattened script directly from the root
-    python3 __main__.py --match="$cat" --full --db "/app/database/easy_kicad_catalog.db" --output "/app/outputFile"
+    # Run the flattened script with an explicit sub-target to force the base folder correctly
+    python3 __main__.py --match="$cat" --full --db "/app/database/easy_kicad_catalog.db" --output "/app/outputFile/easy_kicad"
 done
 
 echo "✅ All categories finished mirroring!"
