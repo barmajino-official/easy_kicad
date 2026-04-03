@@ -1,7 +1,7 @@
 # easy_kicad Database Overview
 
 ## File Information
-- **Location**: `/home/barmajino/.platformio/penv/lib/python3.12/site-packages/easy_kicad/database/easykicadprovition.db`
+- **Location**: `.-packages/easy_kicad/database/easykicadprovition.db`
 - **Size**: ~1.3 GB
 - **Type**: SQLite 3
 

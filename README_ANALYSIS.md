@@ -105,7 +105,7 @@ info=EeSymbolInfo(
 **Command**:
 
 ```bash
-cd /home/barmajino/.platformio/penv/lib/python3.12/site-packages/easy_kicad && python -c "
+cd . && python -c "
 import json
 from easy_kicad.easyeda.easyeda_api import EasyedaApi
 
