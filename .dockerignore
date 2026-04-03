@@ -1,0 +1,8 @@
+database/
+outputFile/
+.git/
+__pycache__/
+*.pyc
+*.log
+venv/
+.platformio/

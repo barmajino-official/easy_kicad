@@ -1,47 +1,66 @@
 # Global imports
 import logging
-
+import time
 import requests
 
 from easy_kicad import __version__
 
+# Endpoint pointing directly to the hidden EasyEDA API (found by reverse-engineering the web editor)
 API_ENDPOINT = "https://easyeda.com/api/products/{lcsc_id}/components?version=6.4.19.5"
 ENDPOINT_3D_MODEL = "https://modules.easyeda.com/3dmodel/{uuid}"
 ENDPOINT_3D_MODEL_STEP = "https://modules.easyeda.com/qAxj6KHrDKw4blvCG8QJPs7Y/{uuid}"
-# ENDPOINT_3D_MODEL_STEP found in https://modules.lceda.cn/smt-gl-engine/0.8.22.6032922c/smt-gl-engine.js : points to the bucket containing the step files.
 
 # ------------------------------------------------------------
 
 
 class EasyedaApi:
     def __init__(self) -> None:
+        # Standard browser User-Agent to avoid early blocking
         self.headers = {
             "Accept-Encoding": "gzip, deflate",
             "Accept": "application/json, text/javascript, */*; q=0.01",
             "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
-            "User-Agent": f"easy_kicad v{__version__}",
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
         }
 
     def get_info_from_easyeda_api(self, lcsc_id: str) -> dict:
-        try:
-            r = requests.get(url=API_ENDPOINT.format(lcsc_id=lcsc_id), headers=self.headers)
-            if r.status_code != 200:
-                logging.debug(f"API Error {r.status_code} for {lcsc_id}")
+        # ⚡ Anti-Blocking: Short delay between parts
+        time.sleep(1.0)
+        
+        max_retries = 1
+        for attempt in range(max_retries + 1):
+            try:
+                r = requests.get(url=API_ENDPOINT.format(lcsc_id=lcsc_id), headers=self.headers, timeout=10)
+                
+                if r.status_code == 200:
+                    api_response = r.json()
+                    if not api_response or (
+                        "code" in api_response and api_response["success"] is False
+                    ):
+                        logging.debug(f"API Error Response for {lcsc_id}: {api_response}")
+                        return {}
+                    return api_response
+                
+                # 🛑 Handle Rate Limiting (429) or Server Overload
+                if r.status_code == 429 or attempt < max_retries:
+                    wait_time = 5 * (attempt + 1)
+                    logging.warning(f"⚠️ API Error {r.status_code} for {lcsc_id}. Waiting {wait_time}s and retrying... ({attempt+1}/{max_retries})")
+                    time.sleep(wait_time)
+                    continue
+                else:
+                    logging.error(f"❌ API Error {r.status_code} for {lcsc_id}. Abandoning.")
+                    return {}
+
+            except (requests.exceptions.JSONDecodeError, ValueError) as e:
+                logging.error(f"❌ Invalid JSON received for {lcsc_id}: {e}")
                 return {}
-            
-            api_response = r.json()
-            if not api_response or (
-                "code" in api_response and api_response["success"] is False
-            ):
-                logging.debug(f"{api_response}")
+            except Exception as e:
+                if attempt < max_retries:
+                    time.sleep(2)
+                    continue
+                logging.error(f"❌ Connection error for {lcsc_id}: {e}")
                 return {}
-            return api_response
-        except (requests.exceptions.JSONDecodeError, ValueError) as e:
-            logging.error(f"Failed to parse JSON for {lcsc_id}: {e}")
-            return {}
-        except Exception as e:
-            logging.error(f"Unexpected error fetching {lcsc_id}: {e}")
-            return {}
+        return {}
 
     def get_cad_data_of_component(self, lcsc_id: str) -> dict:
         cp_cad_info = self.get_info_from_easyeda_api(lcsc_id=lcsc_id)
