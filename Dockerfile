@@ -7,6 +7,7 @@ WORKDIR /app
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
     sqlite3 \
+    curl \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy the project files to the container

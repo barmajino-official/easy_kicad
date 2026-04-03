@@ -2,6 +2,8 @@
 import logging
 import time
 import random
+import json
+import subprocess
 import requests
 
 from easy_kicad import __version__
@@ -39,13 +41,25 @@ class EasyedaApi:
         max_retries = 2
         for attempt in range(max_retries + 1):
             try:
-                r = requests.get(url=API_ENDPOINT.format(lcsc_id=lcsc_id), headers=self.headers, timeout=12)
+                # 🛡️ THE NUCLEAR OPTION: Using 'curl' directly
+                # Cloudflare blocks Python 'requests' TLS finger-printing, but 'curl' is usually allowed.
+                url = API_ENDPOINT.format(lcsc_id=lcsc_id)
+                cmd = [
+                    "curl", "-s", "-L",
+                    "-A", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+                    "-H", "Referer: https://easyeda.com/editor",
+                    "-H", "Accept: application/json",
+                    "--max-time", "15",
+                    url
+                ]
                 
-                if r.status_code == 200:
+                result = subprocess.run(cmd, capture_output=True, text=True)
+                
+                if result.returncode == 0:
                     try:
-                        api_response = r.json()
-                    except ValueError:
-                        logging.error(f"❌ Received non-JSON response for {lcsc_id}. Possible block.")
+                        api_response = json.loads(result.stdout)
+                    except json.JSONDecodeError:
+                        logging.error(f"❌ Received non-JSON response from curl for {lcsc_id}. Possible block.")
                         time.sleep(30)
                         continue
 
@@ -56,35 +70,14 @@ class EasyedaApi:
                         return {}
                     return api_response
                 
-                # 🛑 Handle Rate Limiting (429)
-                if r.status_code == 429:
-                    logging.warning(f"🚨 Rate Limited! Waiting 60s before retry... ({attempt+1}/{max_retries})")
-                    time.sleep(60)
-                    continue
-                
-                # 🛑 Handle Server Overload (5xx)
-                if r.status_code >= 500:
-                    logging.warning(f"⚠️ Server Error {r.status_code}. Waiting 15s... ({attempt+1}/{max_retries})")
-                    time.sleep(15)
-                    continue
-                
-                # 🛑 Handle Other Errors
-                if attempt < max_retries:
-                    wait_time = 5 * (attempt + 1)
-                    logging.warning(f"⚠️ API Error {r.status_code} for {lcsc_id}. Waiting {wait_time}s... ({attempt+1}/{max_retries})")
-                    time.sleep(wait_time)
-                    continue
-                else:
-                    logging.error(f"❌ API Error {r.status_code} for {lcsc_id}. Giving up on this part.")
-                    return {}
-
-            except requests.exceptions.Timeout:
-                logging.warning(f"⏳ Timeout for {lcsc_id}. Waiting 10s... ({attempt+1}/{max_retries})")
+                # Handle curl errors
+                logging.warning(f"⚠️ Curl failed with code {result.returncode}. Retrying... ({attempt+1}/{max_retries})")
                 time.sleep(10)
                 continue
+
             except Exception as e:
                 if attempt < max_retries:
-                    logging.warning(f"🔌 Connection error: {e}. Retrying in 5s...")
+                    logging.warning(f"🔌 Connection error in curl bridge: {e}. Retrying in 5s...")
                     time.sleep(5)
                     continue
                 logging.error(f"❌ Fatal error for {lcsc_id}: {e}")
