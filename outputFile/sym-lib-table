@@ -1,4 +1,0 @@
-(sym_lib_table
-  (lib (name "RES - Resistors")(type "KiCad")(uri "/home/barmajino/.platformio/penv/lib/python3.12/site-packages/barmajinokad/outputFile/RES - Resistors.kicad_sym")(options "")(descr ""))
-  (lib (name "TRN - Transistors")(type "KiCad")(uri "/home/barmajino/.platformio/penv/lib/python3.12/site-packages/barmajinokad/outputFile/TRN - Transistors.kicad_sym")(options "")(descr ""))
-)
