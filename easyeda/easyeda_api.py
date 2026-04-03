@@ -42,10 +42,10 @@ class EasyedaApi:
         for attempt in range(max_retries + 1):
             try:
                 # 🛡️ THE NUCLEAR OPTION: Using 'curl' directly
-                # Cloudflare blocks Python 'requests' TLS finger-printing, but 'curl' is usually allowed.
+                # Force IPv4 (-4) as sometimes Docker IPv6 triggers WAF blocks
                 url = API_ENDPOINT.format(lcsc_id=lcsc_id)
                 cmd = [
-                    "curl", "-s", "-L",
+                    "curl", "-s", "-L", "-4",
                     "-A", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
                     "-H", "Referer: https://easyeda.com/editor",
                     "-H", "Accept: application/json",
@@ -59,7 +59,7 @@ class EasyedaApi:
                     try:
                         api_response = json.loads(result.stdout)
                     except json.JSONDecodeError:
-                        logging.error(f"❌ Received non-JSON response from curl for {lcsc_id}. Possible block.")
+                        logging.error(f"❌ Received non-JSON response from curl for {lcsc_id}. Possible block. Body: {result.stdout[:200]}")
                         time.sleep(30)
                         continue
 
@@ -71,7 +71,7 @@ class EasyedaApi:
                     return api_response
                 
                 # Handle curl errors
-                logging.warning(f"⚠️ Curl failed with code {result.returncode}. Retrying... ({attempt+1}/{max_retries})")
+                logging.warning(f"⚠️ Curl failed with code {result.returncode} for {lcsc_id}. Error: {result.stderr[:100]}")
                 time.sleep(10)
                 continue
 
