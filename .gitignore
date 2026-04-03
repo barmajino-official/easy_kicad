@@ -5,7 +5,7 @@ __pycache__/
 *.pyc
 
 # Data
-database/easykicadprovition.db
+database/easy_kicad_catalog.db
 outputFile/
 temp/
 

@@ -7,7 +7,7 @@ class DBManager:
         if db_path is None:
             # Default path relative to this file
             base_dir = os.path.dirname(os.path.abspath(__file__))
-            db_path = os.path.join(base_dir, "easykicadprovition.db")
+            db_path = os.path.join(base_dir, "easy_kicad_catalog.db")
         
         self.db_path = db_path
         self.conn = None

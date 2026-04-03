@@ -33,7 +33,7 @@ All mirrored components are stored in the `outputFile/` directory, organized by 
 
 ## ⚙️ Configuration & Database
 
-The tool uses a local SQLite database (`database/easykicadprovition.db`) to track mirrored components and prevent redundant downloads.
+The tool uses a local SQLite database (`database/easy_kicad_catalog.db`) to track mirrored components and prevent redundant downloads.
 
 ### Smart Categorization
 The tool automatically sorts components into logical libraries based on their metadata and description. For example, any component with "Resistor" in its description will be grouped into the `RES - Resistors` library.
