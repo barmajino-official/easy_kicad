@@ -6,7 +6,7 @@ import json
 import subprocess
 import requests
 
-from easy_kicad import __version__
+from helpers import __version__
 
 # Endpoint pointing directly to the hidden EasyEDA API (found by reverse-engineering the web editor)
 API_ENDPOINT = "https://easyeda.com/api/products/{lcsc_id}/components?version=6.4.19.5"

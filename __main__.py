@@ -6,17 +6,25 @@ import logging
 import re
 from textwrap import dedent
 from typing import List
+from enum import Enum
 
-from easy_kicad import __version__
-from easy_kicad.database.db_manager import DBManager
-from easy_kicad.easyeda.easyeda_api import EasyedaApi
-from easy_kicad.easyeda.easyeda_importer import (
+# 🛡️ Dynamic Path Injection
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+
+try:
+    from helpers import __version__
+except ImportError:
+    from __init__ import __version__
+
+from database.db_manager import DBManager
+from easyeda.easyeda_api import EasyedaApi
+from easyeda.easyeda_importer import (
     Easyeda3dModelImporter,
     EasyedaFootprintImporter,
     EasyedaSymbolImporter,
 )
-from easy_kicad.easyeda.parameters_easyeda import EeSymbol
-from easy_kicad.helpers import (
+from easyeda.parameters_easyeda import EeSymbol
+from helpers import (
     add_component_in_symbol_lib_file,
     get_local_config,
     id_already_in_symbol_lib,
@@ -24,10 +32,10 @@ from easy_kicad.helpers import (
     update_component_in_symbol_lib_file,
     update_kicad_lib_tables,
 )
-from easy_kicad.kicad.export_kicad_3d_model import Exporter3dModelKicad
-from easy_kicad.kicad.export_kicad_footprint import ExporterFootprintKicad
-from easy_kicad.kicad.export_kicad_symbol import ExporterSymbolKicad
-from easy_kicad.kicad.parameters_kicad_symbol import KicadVersion
+from kicad.export_kicad_3d_model import Exporter3dModelKicad
+from kicad.export_kicad_footprint import ExporterFootprintKicad
+from kicad.export_kicad_symbol import ExporterSymbolKicad
+from kicad.parameters_kicad_symbol import KicadVersion
 
 
 def get_parser() -> argparse.ArgumentParser:

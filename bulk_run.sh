@@ -12,8 +12,8 @@ for cat in $CATEGORIES; do
     echo "⚡ Processing: $cat"
     echo "------------------------------------------------------------"
     
-    # Run the installed package correctly
-    python3 -m easy_kicad --match="$cat" --full --db "/app/database/easy_kicad_catalog.db" --output "/app/outputFile"
+    # Run the flattened script directly from the root
+    python3 __main__.py --match="$cat" --full --db "/app/database/easy_kicad_catalog.db" --output "/app/outputFile"
 done
 
 echo "✅ All categories finished mirroring!"
