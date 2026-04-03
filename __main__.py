@@ -108,6 +108,14 @@ def get_parser() -> argparse.ArgumentParser:
     )
 
     parser.add_argument(
+        "--db",
+        required=False,
+        help="Path to the SQLite database",
+        default="database/easy_kicad_catalog.db",
+        type=str,
+    )
+
+    parser.add_argument(
         "--debug",
         help="set the logging level to debug",
         required=False,
@@ -253,7 +261,7 @@ def main(argv: List[str] = sys.argv[1:]) -> int:
     output_base_folder = os.path.dirname(arguments["output"])
 
     # Initialize DB manager
-    db = DBManager()
+    db = DBManager(db_path=arguments.get("db"))
     
     # Determine the list of IDs to process
     if arguments.get("match"):
