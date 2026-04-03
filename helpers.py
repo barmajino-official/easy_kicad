@@ -226,3 +226,22 @@ def update_kicad_lib_tables(output_dir: str):
         pass
 
     logging.info(f"Updated KiCad master library tables in {output_dir}")
+
+
+def update_readme(output_dir: str, lcsc_id: str, component_name: str, description: str):
+    """
+    Updates a README.md file in the output directory with the new component.
+    """
+    readme_path = os.path.join(output_dir, "README.md")
+    
+    if not os.path.isfile(readme_path):
+        with open(readme_path, "w", encoding="utf-8") as f:
+            f.write("# Mirrored KiCad Components\n\n")
+            f.write("| LCSC ID | Name | Description | Date |\n")
+            f.write("| --- | --- | --- | --- |\n")
+
+    date_str = datetime.now().strftime("%Y-%m-%d %a")
+    line = f"| {lcsc_id} | {component_name} | {description} | {date_str} |\n"
+    
+    with open(readme_path, "a", encoding="utf-8") as f:
+        f.write(line)
