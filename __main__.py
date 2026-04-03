@@ -283,26 +283,15 @@ def main(argv: List[str] = sys.argv[1:]) -> int:
 
     # --- PROCESS EACH COMPONENT ---
     total_parts = len(lcsc_ids)
-    import random as rand_lib # To avoid confusion with the random delay logic
+    actual_downloads_count = 0
     
     for index, component_id in enumerate(lcsc_ids, 1):
-        # 🧘 HUMAN BREAK: Every 20 parts, take a long pause (30-90s)
-        if index > 1 and index % 20 == 0:
-            break_time = rand_lib.uniform(30.0, 90.0)
-            logging.info(f"🧘 Taking a Human Break for {int(break_time)}s to avoid detection...")
-            time.sleep(break_time)
-
         # Get Metadata for categorization and skipping
         metadata = db.get_part_metadata(component_id)
         progress_str = f"[{index}/{total_parts}]"
-        easyeda_symbol = None
-        easyeda_footprint = None
-
-        # Determine library file name and path for this part
+        
+        # Determine library file name and path for this part early (for skip logic)
         lib_name = "MISC - Others" # Default
-        raw_cat = "Others"
-        raw_sub = "Miscellaneous"
-
         if metadata:
             raw_cat = metadata['category_name']
             raw_sub = metadata['subcategory_name'] or "Others"
@@ -360,7 +349,18 @@ def main(argv: List[str] = sys.argv[1:]) -> int:
             else:
                 logging.warning(f"{progress_str} {component_id} is marked as mirrored but library file is missing. Re-downloading...")
 
+        # 🧘 HUMAN BREAK: Only take a break after 20 ACTUAL downloads
+        if actual_downloads_count > 0 and actual_downloads_count % 20 == 0:
+            import random as rand_lib
+            break_time = rand_lib.uniform(30.0, 90.0)
+            logging.info(f"🧘 Taking a Human Break for {int(break_time)}s to avoid detection...")
+            time.sleep(break_time)
+            # Reset count or let it continue to % 20? 
+            # I'll reset after the break for cleaner logic.
+            actual_downloads_count = 0
+
         logging.info(f"{progress_str} == Mirroring Part: {component_id} ==")
+        actual_downloads_count += 1
         
         # Get CAD data
         api = EasyedaApi()
